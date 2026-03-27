@@ -1,0 +1,42 @@
+.hand-animation-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.hand-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hand-image.shaking {
+  /* Shake duration matches the App.tsx timeout */
+  animation: shakeHand 1.2s ease-in-out;
+}
+
+.hand-image.revealed {
+  display: block;
+}
+
+@keyframes shakeHand {
+  /* Start and end at normal position */
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  /* Quick rotation and bounce */
+  10%, 30%, 50%, 70%, 90% {
+    transform: rotate(15deg) translateY(-15px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: rotate(15deg) translateY(0);
+  }
+}
+
+.hand-placeholder {
+  font-size: 5rem;
+  opacity: 0.3;
+}

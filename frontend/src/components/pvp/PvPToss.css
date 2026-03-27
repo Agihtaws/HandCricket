@@ -1,0 +1,532 @@
+/* ===== PvPToss.css ===== */
+/* Inherits variables from App.css – matches game toss design exactly */
+
+.pvp-toss {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+
+/* ─── Header (for picking phase) ───────────────────────── */
+.toss-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 60px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px var(--shadow);
+}
+
+.back-btn {
+  background: transparent;
+  border: 2px solid var(--golden);
+  color: var(--golden);
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.9rem;
+}
+.back-btn:hover {
+  background: var(--golden);
+  color: var(--cricket-dark);
+}
+
+.toss-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--cream);
+}
+
+.toss-player-badge {
+  background: var(--golden);
+  color: var(--cricket-dark);
+  padding: 4px 16px;
+  border-radius: 40px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* ─── Main Card (replaces .toss-stage for some phases) ── */
+.toss-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px var(--shadow);
+  animation: slideIn 0.4s ease-out;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.toss-card--narrow {
+  max-width: 500px;
+}
+
+.toss-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* ─── Game ID chip ─────────────────────────────────────── */
+.game-id-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 20px;
+  border-radius: 40px;
+  margin: 0 auto 10px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.chip-label {
+  opacity: 0.7;
+}
+.chip-val {
+  font-family: monospace;
+  color: var(--golden);
+  font-weight: 600;
+}
+
+/* ─── Toss sections ────────────────────────────────────── */
+.toss-section {
+  text-align: left;
+}
+.toss-section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+}
+.step-badge {
+  background: var(--golden);
+  color: var(--cricket-dark);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* ─── Odd/Even buttons (reuse .choice-buttons + custom) ─ */
+.oddeven-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+.oddeven-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--golden);
+  border-radius: 16px;
+  padding: 20px;
+  color: var(--cream);
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.oddeven-btn.active {
+  background: rgba(247, 147, 30, 0.2);
+  border-color: var(--golden);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--golden);
+}
+.oe-emoji {
+  font-size: 2rem;
+}
+.oe-label {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.oe-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ─── P2 hint ──────────────────────────────────────────── */
+.p2-toss-hint {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid var(--orange-accent);
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  gap: 10px;
+  font-size: 0.95rem;
+  margin: 10px 0;
+}
+
+/* ─── Number grid (reuse .toss-number-grid) ───────────── */
+.toss-number-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.toss-num-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--golden);
+  border-radius: 16px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.toss-num-btn.active {
+  background: rgba(247, 147, 30, 0.2);
+  transform: scale(1.08);
+  box-shadow: 0 0 15px var(--golden);
+}
+.toss-num-btn img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+/* ─── Selection summary ────────────────────────────────── */
+.selection-summary {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.summary-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(247, 147, 30, 0.3);
+  border-radius: 40px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  color: var(--cream);
+  opacity: 0.7;
+}
+.summary-chip--set {
+  border-color: var(--golden);
+  background: rgba(247, 147, 30, 0.1);
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* ─── Submit button ────────────────────────────────────── */
+.toss-submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--golden);
+  border-radius: 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--cream);
+  cursor: not-allowed;
+  transition: 0.2s;
+}
+.toss-submit-btn--ready {
+  background: linear-gradient(135deg, var(--orange-accent), var(--golden));
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+.toss-submit-btn--ready:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6);
+}
+
+/* ─── Waiting / Submitted state ───────────────────────── */
+.waiting-ball {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  animation: bounceBall 1.2s infinite;
+}
+@keyframes bounceBall {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.waiting-title {
+  font-size: 2rem;
+  color: var(--golden);
+  margin-bottom: 15px;
+}
+
+.locked-summary {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.locked-chip {
+  background: rgba(247, 147, 30, 0.1);
+  border: 2px solid var(--golden);
+  border-radius: 40px;
+  padding: 8px 20px;
+  font-size: 1rem;
+}
+
+.toss-status-text {
+  font-size: 1.2rem;
+  color: var(--cream);
+  opacity: 0.9;
+  margin-top: 20px;
+}
+
+.toss-vs-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  border-radius: 40px;
+}
+.vs-name {
+  font-weight: bold;
+}
+.vs-name--mine {
+  color: var(--golden);
+}
+.vs-name--opp {
+  color: var(--orange-accent);
+}
+.vs-divider {
+  opacity: 0.5;
+}
+
+/* ─── Reveal phase (exactly matches game toss) ────────── */
+.reveal-stage {
+  composes: toss-stage; /* reuse existing class */
+}
+.reveal-winner {
+  margin-top: 30px;
+  font-size: 1.8rem;
+  animation: fadeIn 0.6s ease-out;
+}
+.winner-crown {
+  font-size: 2.5rem;
+  margin-right: 10px;
+}
+.winner-text {
+  font-weight: bold;
+  color: var(--golden);
+}
+
+/* ─── Bat/Bowl choice ──────────────────────────────────── */
+.bat-bowl-header {
+  margin-bottom: 30px;
+}
+.bat-bowl-crown {
+  font-size: 3rem;
+  display: block;
+}
+.bat-bowl-title {
+  font-size: 2rem;
+  color: var(--golden);
+  margin: 10px 0;
+}
+.bat-bowl-sub {
+  opacity: 0.9;
+}
+
+.bat-bowl-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+.bat-bowl-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--golden);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--cream);
+}
+.bat-bowl-btn:hover {
+  transform: translateY(-5px);
+  border-color: var(--golden);
+  box-shadow: 0 10px 25px var(--shadow);
+}
+.bat-bowl-btn--bat {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(247, 147, 30, 0.2));
+}
+.bat-bowl-btn--bowl {
+  background: linear-gradient(135deg, rgba(67, 160, 71, 0.2), rgba(46, 125, 94, 0.2));
+}
+.bb-emoji {
+  font-size: 2.5rem;
+}
+.bb-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.bb-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.bat-bowl-toss-recap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+.recap-sep {
+  opacity: 0.5;
+}
+.recap-odd {
+  color: var(--orange-accent);
+  font-weight: bold;
+}
+.recap-even {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+/* ─── Toss loser waiting ───────────────────────────────── */
+.loss-recap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 16px;
+  border-radius: 40px;
+  margin: 20px 0;
+  font-size: 0.95rem;
+}
+.loss-recap-label {
+  opacity: 0.7;
+}
+
+/* ─── Connecting / Starting / Error states ────────────── */
+.connecting-anim {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  animation: spin 2s infinite linear;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.launch-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+.launch-title {
+  font-size: 2rem;
+  color: var(--golden);
+  margin-bottom: 10px;
+}
+.launch-sub {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.toss-error-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+.toss-error-title {
+  font-size: 2rem;
+  color: var(--orange-accent);
+  margin-bottom: 10px;
+}
+.toss-error-body {
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+.toss-btn--back {
+  background: transparent;
+  border: 2px solid var(--golden);
+  color: var(--golden);
+  padding: 12px 30px;
+  border-radius: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.toss-btn--back:hover {
+  background: var(--golden);
+  color: var(--cricket-dark);
+}
+
+/* ─── Reuse game toss animations and keyframes ────────── */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Responsive ───────────────────────────────────────── */
+@media (max-width: 600px) {
+  .toss-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .choice-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  .choice-button {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.4rem;
+  }
+  .toss-number-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .toss-hands-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .toss-vs {
+    margin: 10px 0;
+  }
+  .bat-bowl-row {
+    flex-direction: column;
+  }
+  .calc-row {
+    font-size: 2rem;
+    gap: 10px;
+  }
+}

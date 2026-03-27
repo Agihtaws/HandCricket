@@ -1,0 +1,6 @@
+[package]
+name = "hand_cricket"
+edition = "2024.beta"
+
+[addresses]
+hand_cricket = "0x0"

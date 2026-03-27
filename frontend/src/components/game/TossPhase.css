@@ -1,0 +1,230 @@
+.toss-phase {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.toss-stage {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 20px 50px var(--shadow);
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toss-title {
+  font-size: 2.2rem;
+  color: var(--golden);
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px var(--shadow);
+}
+
+.toss-instruction {
+  font-size: 1.2rem;
+  color: var(--cream);
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+/* Odd/Even & Bat/Bowl Buttons */
+.choice-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.choice-button {
+  padding: 25px 45px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: white;
+  min-width: 160px;
+}
+
+.odd-button {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  box-shadow: 0 8px 20px rgba(255, 75, 43, 0.3);
+}
+
+.even-button {
+  background: linear-gradient(135deg, #00b4db, #0083b0);
+  box-shadow: 0 8px 20px rgba(0, 180, 219, 0.3);
+}
+
+.bat-button {
+  background: linear-gradient(135deg, var(--orange-accent), #e65100);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+}
+
+.bowl-button {
+  background: linear-gradient(135deg, #43a047, #2e7d32);
+  box-shadow: 0 8px 20px rgba(67, 160, 71, 0.3);
+}
+
+.choice-button:hover {
+  transform: translateY(-5px) scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Number Selection Grid */
+.toss-number-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.toss-num-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--golden);
+  border-radius: 16px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toss-num-btn img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.toss-num-btn:hover {
+  background: rgba(247, 147, 30, 0.2);
+  transform: scale(1.08);
+  box-shadow: 0 0 15px var(--golden);
+}
+
+/* Reveal Stage Hands */
+.toss-hands-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin: 20px 0;
+}
+
+.toss-hand-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.toss-hand-label {
+  font-weight: bold;
+  color: var(--orange-accent);
+  font-size: 1.1rem;
+}
+
+.toss-hand-display {
+  width: 150px;
+  height: 150px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  border: 3px solid var(--cricket-light-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.toss-vs {
+  background: var(--golden);
+  color: var(--cricket-dark);
+  padding: 10px 18px;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px var(--shadow);
+}
+
+/* Calculation & Results */
+.calculation-area {
+  margin-top: 25px;
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.calc-row {
+  font-size: 2.8rem;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  color: var(--cream);
+  margin-bottom: 15px;
+}
+
+.sum-val {
+  color: var(--golden);
+  background: rgba(247, 147, 30, 0.1);
+  padding: 0 15px;
+  border-radius: 10px;
+}
+
+.sum-type {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  letter-spacing: 1px;
+}
+
+.continue-button {
+  padding: 16px 45px;
+  background: linear-gradient(135deg, var(--golden), var(--orange-accent));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.continue-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.6);
+}
+
+.auto-choice p {
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  color: var(--cream);
+}
