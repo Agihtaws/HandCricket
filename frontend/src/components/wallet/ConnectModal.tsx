@@ -205,21 +205,21 @@ export default function ConnectModal({ open, onClose }: ConnectModalProps) {
 
                 {wallets.length === 0 ? (
                   <div className="text-center py-8 space-y-3">
-                    <div className="text-4xl select-none opacity-40">🦊</div>
-                    <p className="text-[#ffffff50] text-sm leading-relaxed">
-                      No wallets detected.<br />
-                      Install a Sui-compatible wallet to continue.
-                    </p>
-                    <a
-                      href="https://suiwallet.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block mt-2 text-xs text-[#00ff88] border border-[#00ff8840]
-                        px-4 py-2 rounded-lg hover:bg-[#00ff8812] transition-all duration-200"
-                    >
-                      Get Sui Wallet →
-                    </a>
-                  </div>
+  <div className="text-4xl select-none opacity-40">💼</div>
+  <p className="text-[#ffffff50] text-sm leading-relaxed">
+    No wallet detected.<br />
+    Install <strong className="text-[#00ff88]">OneWallet</strong> to play.
+  </p>
+  <a
+    href="https://chromewebstore.google.com/detail/onewallet/gclmcgmpkgblaglfokkaclneihpnbkli"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block mt-2 text-xs text-[#00ff88] border border-[#00ff8840]
+      px-4 py-2 rounded-lg hover:bg-[#00ff8812] transition-all duration-200"
+  >
+    Get OneWallet →
+  </a>
+</div>
                 ) : (
                   wallets.map((wallet, i) => (
                     <button
