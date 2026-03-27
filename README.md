@@ -154,7 +154,7 @@ Then you can use `one client gas` to see your coins. Make sure you have **at lea
 
 ## 🔗 Links & Placeholders
 
-- **Frontend Live**: [🔗 Frontend URL – coming soon]
+- **Frontend Live**: [🔗 https://hand-cricket-lyart.vercel.app](https://hand-cricket-lyart.vercel.app)
 - **YouTube Demo**: [🎥 Watch the walkthrough – coming soon]
 - **GitHub Repository**: [📁 https://github.com/Agihtaws/HandCricket](https://github.com/Agihtaws/HandCricket)
 
