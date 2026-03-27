@@ -18,7 +18,7 @@ const EInsufficientTreasury: u64 = 6;
 
 // ===== Status Constants =====
 
-const STATUS_PENDING: u8 = 0;   // user bet locked, waiting for backend to activate
+const STATUS_PENDING: u8 = 0;   
 const STATUS_TOSS: u8 = 1;
 const STATUS_PLAYING: u8 = 2;
 const STATUS_FINISHED: u8 = 3;
@@ -78,9 +78,7 @@ public struct Game has key {
 
 // ===== Public Functions =====
 
-/// Called by the PLAYER from the frontend.
-/// Only touches the player's own coins + the shared Treasury object.
-/// Does NOT require GameCap — keeps that secret on the backend.
+
 public fun user_create_game(
     treasury: &mut Treasury,
     player_bet: Coin<OCT>,
@@ -93,7 +91,7 @@ public fun user_create_game(
         id: object::new(ctx),
         player,
         player_bet: coin::into_balance(player_bet),
-        treasury_bet: balance::zero<OCT>(),   // backend fills this in activate_game
+        treasury_bet: balance::zero<OCT>(),   
         status: STATUS_PENDING,
         current_batter: BATTING_PLAYER,
         innings: 1,
@@ -107,9 +105,7 @@ public fun user_create_game(
     transfer::share_object(game);
 }
 
-/// Called by the BACKEND immediately after user_create_game.
-/// Locks the treasury's matching bet and moves the game to TOSS status.
-/// Requires GameCap — only the backend admin can call this.
+
 public fun activate_game(
     game_cap: &GameCap,
     treasury: &mut Treasury,
@@ -123,8 +119,7 @@ public fun activate_game(
     event::emit(GameActivated { game_id: object::id(game) });
 }
 
-/// Legacy entry — kept for backend-only / admin use if needed.
-/// NOT called from the frontend anymore.
+
 public fun create_game(
     game_cap: &GameCap,
     treasury: &mut Treasury,

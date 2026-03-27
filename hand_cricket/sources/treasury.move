@@ -34,7 +34,6 @@ public struct WinnerPaid has copy, drop {
 
 // ===== Structs =====
 
-// FIX: removed `store` from AdminCap — prevents public wrapping/transfer
 public struct AdminCap has key { id: UID }
 public struct GameCap has key { id: UID }
 
@@ -80,7 +79,6 @@ public fun withdraw(
 ) {
     assert!(recipient != @0x0, EInvalidAddress);
     let current_balance = balance::value(&treasury.balance);
-    // FIX: split the check to avoid u64 overflow from amount + MIN_RESERVE
     assert!(current_balance >= MIN_RESERVE, EInsufficientTreasury);
     assert!(current_balance - MIN_RESERVE >= amount, EInsufficientTreasury);
     let withdrawn = coin::from_balance(balance::split(&mut treasury.balance, amount), ctx);
@@ -90,12 +88,10 @@ public fun withdraw(
 
 // ===== Game Contract Functions =====
 
-// NEW: exposed so game.move and pvp_game.move share a single source of truth
 public fun bet_amount(): u64 { BET_AMOUNT }
 
 public fun lock_bet(_: &GameCap, treasury: &mut Treasury, ctx: &mut TxContext): Coin<OCT> {
     let current_balance = balance::value(&treasury.balance);
-    // FIX: same safe split pattern as withdraw
     assert!(current_balance >= MIN_RESERVE, EInsufficientTreasury);
     assert!(current_balance - MIN_RESERVE >= BET_AMOUNT, EInsufficientTreasury);
     treasury.total_games_played = treasury.total_games_played + 1;

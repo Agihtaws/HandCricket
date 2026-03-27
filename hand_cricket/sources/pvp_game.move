@@ -4,7 +4,6 @@ use one::coin::{Self, Coin};
 use one::oct::OCT;
 use one::balance::{Self, Balance};
 use one::event;
-// FIX: import Self so we can call treasury::bet_amount() — removes duplicate constant
 use hand_cricket::treasury::{Self, GameCap};
 
 // ===== Status Constants =====
@@ -109,7 +108,6 @@ public fun create_game(player1_bet: Coin<OCT>, ctx: &mut TxContext) {
 
 public fun join_game(game: &mut PvPGame, player2_bet: Coin<OCT>, ctx: &mut TxContext) {
     assert!(game.status == STATUS_WAITING, ENotWaiting);
-    // FIX: use treasury::bet_amount() — single source of truth
     assert!(coin::value(&player2_bet) == treasury::bet_amount(), EWrongBetAmount);
 
     let sender = tx_context::sender(ctx);
@@ -170,7 +168,7 @@ public fun settle_innings(
         let p1 = *vector::borrow(&p1_moves, i);
         let p2 = *vector::borrow(&p2_moves, i);
 
-        // FIX: validate move range — hand cricket moves are 1–6
+        
         assert!(p1 >= 1 && p1 <= 6, EInvalidMove);
         assert!(p2 >= 1 && p2 <= 6, EInvalidMove);
 
@@ -240,7 +238,7 @@ public fun switch_innings(_: &GameCap, game: &mut PvPGame) {
 public fun end_game(_: &GameCap, game: PvPGame, ctx: &mut TxContext) {
     assert!(game.status == STATUS_FINISHED, ENotFinished);
 
-    // Capture scores before consuming the object (u64 has copy)
+    
     let game_id = object::id(&game);
     let p1_score = game.player1_score;
     let p2_score = game.player2_score;
@@ -272,7 +270,7 @@ public fun end_game(_: &GameCap, game: PvPGame, ctx: &mut TxContext) {
         transfer::public_transfer(payout, w);
         w
     } else {
-        // safety fallback — winner is always Some in PvP, but handled defensively
+
         option::destroy_none(winner);
         transfer::public_transfer(payout, player1);
         player1
@@ -293,7 +291,6 @@ public fun forfeit_game(
     ctx: &mut TxContext,
 ) {
     let game_id = object::id(&game);
-    // Capture status before destructuring (u8 has copy)
     let status = game.status;
 
     let PvPGame {
