@@ -11,7 +11,7 @@ const queryClient = new QueryClient()
 
 const networks = {
   testnet: {
-    url: 'http://localhost:5173/rpc-proxy',  // 👈 Vite proxies this to onelabs.cc
+    url: 'http://localhost:5173/rpc-proxy',
     network: 'testnet',
   },
 }

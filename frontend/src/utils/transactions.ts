@@ -2,8 +2,6 @@ import { Transaction } from '@mysten/sui/transactions';
 import { SuiClient } from '@onelabs/sui/client';
 import { PACKAGE_ID, TREASURY_ID, BET_AMOUNT } from './constants';
 
-// CPU game — user only touches their own coins + shared Treasury.
-// GAME_CAP_ID is NOT needed here — backend calls activate_game separately.
 export const createGameTx = (): Transaction => {
     const tx = new Transaction();
     const [betCoin] = tx.splitCoins(tx.gas, [BET_AMOUNT]);

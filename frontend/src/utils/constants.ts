@@ -1,4 +1,4 @@
-// constants.ts
+
 function getRequired(name: string): string {
   const val = import.meta.env[name];
   if (!val) throw new Error(`Missing required environment variable: ${name}`);

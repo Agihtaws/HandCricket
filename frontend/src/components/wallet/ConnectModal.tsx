@@ -1,7 +1,3 @@
-// src/components/wallet/ConnectModal.tsx
-// Uses @mysten/dapp-kit (NOT @mysten/dapp-kit-react)
-// Matches the user's main.tsx: WalletProvider + SuiClientProvider setup
-
 import { useState, useEffect } from 'react'
 import { useWallets, useConnectWallet } from '@mysten/dapp-kit'
 

@@ -290,7 +290,7 @@ export function usePvPWebSocket(opts: PvPWebSocketOptions): PvPWebSocket | null 
             instance.destroy();
             instanceRef.current = null;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        
     }, [opts.gameId, opts.playerAddress, opts.isPlayer1, opts.url]);
 
     return instanceRef.current;

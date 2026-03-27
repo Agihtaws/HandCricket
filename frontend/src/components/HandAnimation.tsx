@@ -23,7 +23,6 @@ const handImages = {
   6: sixImg,
 };
 
-// Preload all images when the component mounts (optional, prevents flicker)
 const preloadImages = () => {
   Object.values(handImages).forEach((src) => {
     const img = new Image();
@@ -47,7 +46,11 @@ export default function HandAnimation({ number, isAnimating }: HandAnimationProp
           className="hand-image revealed"
         />
       ) : (
-        <div className="hand-placeholder">✋</div>
+        <img
+          src={zeroImg}
+          alt="Closed fist"
+          className="hand-image"
+        />
       )}
     </div>
   );

@@ -21,7 +21,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
     try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
 }
 
-// ── Button styles (matching HomePage) ────────────────────────────────────────
+// ── Button styles ────────────────────────────────────────
 const CREATE_BTN =
     'relative w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-2xl ' +
     'font-bold tracking-wider uppercase text-sm select-none ' +
@@ -213,7 +213,7 @@ export default function PvPLobby({ onGameStart, onBack }: PvPLobbyProps) {
 
     return (
         <>
-            {/* ── Full-viewport shell — NO scroll ── */}
+            
             <div className="h-screen w-full flex items-center justify-center px-4
                 bg-[#030f06] relative overflow-hidden">
 

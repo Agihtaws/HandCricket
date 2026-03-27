@@ -289,8 +289,16 @@ async function resolveBall(room: Room): Promise<void> {
     if (!p1.hasSubmitted) { p1.timeoutLeft--; if (p1.timeoutLeft <= 0) p1ForceOut = true; }
     if (!p2.hasSubmitted) { p2.timeoutLeft--; if (p2.timeoutLeft <= 0) p2ForceOut = true; }
 
-    if (p1ForceOut) p1Move = p2Move;
-    if (p2ForceOut) p2Move = p1Move;
+    if (p1ForceOut) {
+        p1Move = p2.hasSubmitted ? p2.currentMove! : 1;
+    }
+    if (p2ForceOut) {
+        p2Move = p1.hasSubmitted ? p1.currentMove! : 1;
+    }
+
+    // Extra safety: clamp moves to valid range
+    p1Move = Math.min(6, Math.max(1, p1Move));
+    p2Move = Math.min(6, Math.max(1, p2Move));
 
     const isOut = p1Move === p2Move;
 

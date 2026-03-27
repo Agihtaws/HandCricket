@@ -1,4 +1,3 @@
-// src/pages/HomePage.tsx
 import { useState } from 'react'
 import { useDisconnectWallet } from '@mysten/dapp-kit'
 import ConnectModal from '../components/wallet/ConnectModal'

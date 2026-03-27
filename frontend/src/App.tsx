@@ -1,4 +1,3 @@
-// src/App.tsx
 import {
   useCurrentAccount,
   useSuiClientQuery,
@@ -34,7 +33,7 @@ interface PvPState {
   p2Address:     string
 }
 
-// ─── Reusable Tailwind class strings ──────────────────────────────────────────
+// ─── Reusable Tailwind class strings ──────────────────────────────
 const NEON_BTN =
   'relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold tracking-widest uppercase text-sm ' +
   'bg-[#00ff88] text-[#030f06] ' +
@@ -102,7 +101,6 @@ function App() {
     signAndExecute({ transaction: tx }, {
       onSuccess: async (result) => {
         try {
-          // Step 1 — find the Game object the user just created on-chain
           const gameChange = result.objectChanges?.find(
             (obj: any) => obj.objectType?.includes('::game::Game')
           ) as any
@@ -114,8 +112,6 @@ function App() {
 
           const newGameId = gameChange.objectId as string
 
-          // Step 2 — tell the backend to activate the game (lock treasury bet, move to TOSS)
-          // The backend has GameCap; the frontend never needed it.
           const activateRes = await fetch(`${BACKEND_URL}/api/activate-game`, {
             method: 'POST',
             headers: {
@@ -133,7 +129,6 @@ function App() {
             return
           }
 
-          // Step 3 — game is now STATUS_TOSS on-chain, proceed to toss phase
           setGameId(newGameId)
           setPhase('vs-cpu')
         } finally {
@@ -147,50 +142,18 @@ function App() {
     })
   }
 
-  const handleInningsSwitch = async (newTarget: number) => {
-    if (!gameId) return
+ 
+  const handleInningsSwitch = (newTarget: number) => {
     setTargetScore(newTarget)
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/switch-innings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_API_KEY,
-        },
-        body: JSON.stringify({ gameId }),
-      })
-      const result = await res.json()
-      if (result.success) console.log('Innings switched. Digest:', result.digest)
-    } catch (e) { console.error('Backend switch failed:', e) }
+    // no fetch here
   }
 
-  const handleEndGamePayout = async (_: boolean, pScore: number, cScore: number) => {
-    if (!gameId) return
+
+  const handleEndGamePayout = (playerWon: boolean, playerScore: number, computerScore: number) => {
     setIsEndingGame(true)
-    let isWinner = false
-    try {
-      const gameData = await suiClient.getObject({ id: gameId, options: { showContent: true } })
-      isWinner = (gameData.data?.content as any).fields.winner === account?.address
-    } catch {}
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/end-game`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_API_KEY,
-        },
-        body: JSON.stringify({ gameId }),
-      })
-      const result = await res.json()
-      if (result.success) {
-        setGameResult({ playerWon: isWinner, playerScore: pScore, computerScore: cScore })
-        setIsEndingGame(false)
-        refetchBalance()
-      }
-    } catch {
-      setIsEndingGame(false)
-      setGameResult({ playerWon: isWinner, playerScore: pScore, computerScore: cScore })
-    }
+    setGameResult({ playerWon, playerScore, computerScore })
+    setIsEndingGame(false)
+    refetchBalance()
   }
 
   const handleForfeit = async () => {
@@ -218,7 +181,7 @@ function App() {
     setPhase('home')
   }
 
-  // ── PvP handlers ────────────────────────────────────────────────────────
+  // ── PvP handlers ───────────────────────────────────────────────
   const handlePvPLobbyStart = ({ gameId: gId, isPlayer1 }: { gameId: string; isPlayer1: boolean }) => {
     setPvp({ gameId: gId, isPlayer1, currentBatter: 'p1', p1Address: '', p2Address: '' })
     setPhase('pvp-toss')
@@ -234,9 +197,6 @@ function App() {
   const handlePvPGameOver = () => { setPvp(null); setPhase('home'); refetchBalance() }
   const handlePvPBack     = () => { setPvp(null); setPhase('home') }
 
-  // ════════════════════════════════════════════════════════════════════════════
-  //  PvP screens
-  // ════════════════════════════════════════════════════════════════════════════
   if (phase === 'pvp-lobby')
     return <PvPLobby onGameStart={handlePvPLobbyStart} onBack={handlePvPBack} />
 
@@ -263,9 +223,7 @@ function App() {
       />
     )
 
-  // ════════════════════════════════════════════════════════════════════════════
-  //  Computer-mode game screen
-  // ════════════════════════════════════════════════════════════════════════════
+
   if (phase === 'vs-cpu' && gameId) {
     return (
       <div className={FIELD_BG}>
@@ -289,12 +247,7 @@ function App() {
 
             {/* Logo */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <span
-                className="text-xl sm:text-3xl select-none animate-bounce"
-                style={{ animationDuration: '2s' }}
-              >
-                🏏
-              </span>
+              🏏
               <div className="hidden sm:block">
                 <p className="text-[10px] tracking-[0.3em] text-[#00ff8880] uppercase font-semibold">Hand Cricket</p>
                 <p className="text-[8px] tracking-[0.2em] text-[#ffffff30] uppercase">vs CPU</p>
@@ -395,122 +348,79 @@ function App() {
               )}
 
               {/* Result screen */}
-              {!fatalError && gameResult !== null && (
-                <div className="animate-fade-in">
-                  {/* Win/Loss ambient glow */}
-                  <div className={`absolute inset-0 pointer-events-none transition-opacity duration-700 ${
-                    gameResult.playerWon
-                      ? 'bg-[radial-gradient(ellipse_50%_40%_at_50%_50%,#00ff8815,transparent)]'
-                      : 'bg-[radial-gradient(ellipse_50%_40%_at_50%_50%,#ff003315,transparent)]'
-                  }`} />
+{!fatalError && gameResult !== null && (
+  <div className="animate-fade-in w-full max-w-md mx-auto">
+    <div className={`rounded-2xl border backdrop-blur-sm overflow-hidden shadow-lg ${
+      gameResult.playerWon
+        ? 'border-[#00ff8840] bg-[#00ff8808]'
+        : 'border-[#ff444440] bg-[#ff444408]'
+    }`}>
+      {/* Thin accent line */}
+      <div className={`h-0.5 w-full ${gameResult.playerWon ? 'bg-[#00ff88]' : 'bg-[#ff4444]'}`} />
 
-                  <div className={`relative rounded-3xl border backdrop-blur-sm overflow-hidden shadow-2xl ${
-                    gameResult.playerWon
-                      ? 'border-[#00ff8840] bg-[#00ff8808] shadow-[0_0_80px_#00ff8825]'
-                      : 'border-[#ff003340] bg-[#ff00330a] shadow-[0_0_80px_#ff003320]'
-                  }`}>
+      <div className="p-5 sm:p-6 text-center space-y-4">
+        {/* Trophy / skull icon */}
+        <div className="text-4xl sm:text-5xl select-none">
+          {isEndingGame ? '⏳' : gameResult.playerWon ? '🏆' : '💀'}
+        </div>
 
-                    {/* Shimmer bar */}
-                    <div className={`h-1 w-full animate-pulse ${
-                      gameResult.playerWon
-                        ? 'bg-gradient-to-r from-transparent via-[#00ff88] to-transparent'
-                        : 'bg-gradient-to-r from-transparent via-[#ff4444] to-transparent'
-                    }`} />
+        {/* Title */}
+        <div>
+          <h2
+            className={`text-xl sm:text-2xl font-bold tracking-tight ${
+              gameResult.playerWon ? 'text-[#00ff88]' : 'text-[#ff4444]'
+            }`}
+            style={{ fontFamily: 'Orbitron, monospace' }}
+          >
+            {isEndingGame
+              ? 'Processing...'
+              : gameResult.playerWon
+                ? 'VICTORY!'
+                : 'DEFEATED'}
+          </h2>
+          <p className="text-xs text-white/50 mt-1">
+            {isEndingGame ? 'Payout in progress' : gameResult.playerWon ? 'You won the match!' : 'Better luck next time'}
+          </p>
+        </div>
 
-                    <div className="p-5 sm:p-10 text-center space-y-5 sm:space-y-8">
+        {/* Score display */}
+        <div className="flex justify-center gap-4 sm:gap-6">
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-black text-white tabular-nums">
+              {gameResult.playerScore}
+            </div>
+            <div className="text-[10px] text-white/40 uppercase tracking-wider">You</div>
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-xs text-white/30 font-bold">VS</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-black text-white/70 tabular-nums">
+              {gameResult.computerScore}
+            </div>
+            <div className="text-[10px] text-white/40 uppercase tracking-wider">CPU</div>
+          </div>
+        </div>
 
-                      {/* Trophy / skull */}
-                      <div
-                        className="text-5xl sm:text-7xl select-none"
-                        style={{
-                          filter: gameResult.playerWon
-                            ? 'drop-shadow(0 0 20px #00ff8888)'
-                            : 'drop-shadow(0 0 20px #ff444488)',
-                          animation: 'pulse 2s ease-in-out infinite',
-                        }}
-                      >
-                        {isEndingGame ? '⏳' : gameResult.playerWon ? '🏆' : '💀'}
-                      </div>
+        {/* Payout message (only for win) */}
+        {gameResult.playerWon && !isEndingGame && (
+          <p className="text-xs text-[#00ff88]/70 leading-relaxed">
+            +0.2 OCT added to your wallet
+          </p>
+        )}
 
-                      {/* Title */}
-                      <div className="space-y-1">
-                        <p className={`text-[10px] sm:text-xs tracking-[0.4em] uppercase font-semibold ${
-                          gameResult.playerWon ? 'text-[#00ff8880]' : 'text-[#ff444480]'
-                        }`}>
-                          {isEndingGame ? 'Processing' : gameResult.playerWon ? 'Victory' : 'Defeated'}
-                        </p>
-                        <h2
-                          className={`text-2xl sm:text-4xl font-black tracking-tight ${
-                            gameResult.playerWon ? 'text-[#00ff88]' : 'text-[#ff4444]'
-                          }`}
-                          style={{ fontFamily: 'Orbitron, monospace' }}
-                        >
-                          {isEndingGame
-                            ? 'Processing Payout…'
-                            : gameResult.playerWon
-                              ? 'LEGENDARY!'
-                              : 'GAME OVER'}
-                        </h2>
-                      </div>
-
-                      {/* Score cards */}
-                      <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
-                        {/* Player */}
-                        <div className="rounded-xl sm:rounded-2xl border border-[#00ff8830] bg-[#00ff8810]
-                          p-3 sm:p-6 flex flex-col items-center gap-1 sm:gap-2">
-                          <span className="text-[9px] sm:text-xs tracking-[0.2em] text-[#00ff8870] uppercase font-semibold">You</span>
-                          <span
-                            className="text-2xl sm:text-5xl font-black text-[#00ff88] tabular-nums"
-                            style={{ fontFamily: 'Orbitron, monospace' }}
-                          >
-                            {gameResult.playerScore}
-                          </span>
-                          <span className="text-[9px] sm:text-[10px] text-[#ffffff30] uppercase tracking-widest">runs</span>
-                        </div>
-
-                        {/* VS */}
-                        <div className="flex flex-col items-center gap-1">
-                          <div className="w-6 sm:w-8 h-px bg-[#ffffff20]" />
-                          <span className="text-[10px] sm:text-sm font-black text-[#ffffff30] tracking-widest">VS</span>
-                          <div className="w-6 sm:w-8 h-px bg-[#ffffff20]" />
-                        </div>
-
-                        {/* CPU */}
-                        <div className="rounded-xl sm:rounded-2xl border border-[#ff444430] bg-[#ff444410]
-                          p-3 sm:p-6 flex flex-col items-center gap-1 sm:gap-2">
-                          <span className="text-[9px] sm:text-xs tracking-[0.2em] text-[#ff444470] uppercase font-semibold">CPU</span>
-                          <span
-                            className="text-2xl sm:text-5xl font-black text-[#ff4444] tabular-nums"
-                            style={{ fontFamily: 'Orbitron, monospace' }}
-                          >
-                            {gameResult.computerScore}
-                          </span>
-                          <span className="text-[9px] sm:text-[10px] text-[#ffffff30] uppercase tracking-widest">runs</span>
-                        </div>
-                      </div>
-
-                      {/* Payout message */}
-                      <p className="text-[#ffffff60] text-xs sm:text-base leading-relaxed max-w-xs mx-auto">
-                        {gameResult.playerWon
-                          ? '✨ Amazing play! Your 0.2 OCT winnings are heading to your wallet.'
-                          : '😤 Better luck next time! Get back out there and reclaim your OCT.'}
-                      </p>
-
-                      {/* Play again */}
-                      <button
-                        onClick={resetCpuGame}
-                        disabled={isEndingGame}
-                        className={NEON_BTN + ' w-full sm:w-auto sm:px-10 py-3 sm:py-4 text-sm sm:text-base'}
-                        style={{ fontFamily: 'Exo 2, sans-serif' }}
-                      >
-                        <span className="text-lg">🏏</span>
-                        Play Again
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
+        {/* Play again button */}
+        <button
+          onClick={resetCpuGame}
+          disabled={isEndingGame}
+          className="mt-2 px-5 py-2 rounded-full bg-[#00ff88] text-[#030f06] font-bold text-sm hover:shadow-[0_0_20px_#00ff88] transition-all duration-200 disabled:opacity-50"
+        >
+          🏏 Play Again
+        </button>
+      </div>
+    </div>
+  </div>
+)}
             </div>
           </main>
 
@@ -540,9 +450,9 @@ function App() {
     )
   }
 
-  // ════════════════════════════════════════════════════════════════════════════
+
   //  Home screen
-  // ════════════════════════════════════════════════════════════════════════════
+
   return (
     <div className={`app ${account ? 'wallet-connected' : ''}`}>
       <HomePage
