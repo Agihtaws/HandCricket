@@ -11,7 +11,7 @@ const queryClient = new QueryClient()
 
 const networks = {
   testnet: {
-    url: 'http://localhost:5173/rpc-proxy',
+    url: 'https://rpc-testnet.onelabs.cc:443',
     network: 'testnet',
   },
 }
