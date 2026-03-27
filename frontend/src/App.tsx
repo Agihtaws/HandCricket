@@ -33,15 +33,6 @@ interface PvPState {
   p2Address:     string
 }
 
-// ─── Reusable Tailwind class strings ──────────────────────────────
-const NEON_BTN =
-  'relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold tracking-widest uppercase text-sm ' +
-  'bg-[#00ff88] text-[#030f06] ' +
-  'shadow-[0_0_18px_#00ff8888,0_0_40px_#00ff8830] ' +
-  'hover:shadow-[0_0_30px_#00ff88cc,0_0_60px_#00ff8860] ' +
-  'hover:scale-105 active:scale-95 ' +
-  'transition-all duration-200 ease-out ' +
-  'disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100'
 
 const GHOST_BTN =
   'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm ' +

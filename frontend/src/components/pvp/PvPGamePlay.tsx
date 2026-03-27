@@ -188,7 +188,7 @@ export default function PvPGamePlay({
     const [secondsLeft,    setSecondsLeft]    = useState(BALL_SECS);
 
     // ── Move state (raw) ────────────────────────────────────────────────────
-    const [myMove,         setMyMove]         = useState<number | null>(null);
+    const [_myMove, setMyMove] = useState<number | null>(null);
     const [hasSubmitted,   setHasSubmitted]   = useState(false);
     const [lastBall,       setLastBall]       = useState<BallSnapshot | null>(null);
 
