@@ -426,6 +426,10 @@ export default function PvPGamePlay({
     setP1Score(msg.p1Score);
     setP2Score(msg.p2Score);
     if (msg.status === 'playing') {
+        
+        if (msg.ballStartTimestamp && msg.ballStartTimestamp > 0) {
+            startTimer(msg.ballStartTimestamp);
+        }
         setUiPhase('live');
     } else if (msg.status === 'finished') {
     } else {

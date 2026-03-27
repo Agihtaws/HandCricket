@@ -14,7 +14,6 @@ import { Transaction }               from '@onelabs/sui/transactions';
 import { decodeSuiPrivateKey }       from '@onelabs/sui/cryptography';
 import { MIST_PER_SUI }              from '@onelabs/sui/utils';
 
-// --- Constants from environment with defaults ---
 const REQUIRED_ENV = ['ADMIN_SECRET_KEY', 'API_KEY', 'PACKAGE_ID', 'TREASURY_ID', 'GAME_CAP_ID', 'ADMIN_CAP_ID'];
 for (const key of REQUIRED_ENV) {
     if (!process.env[key]) {
@@ -31,7 +30,6 @@ const API_KEY      = process.env.API_KEY!;
 const RPC_URL      = process.env.RPC_URL || getFullnodeUrl('testnet');
 const PORT = Number(process.env.PORT) || 3001;
 
-// Game timings (ms)
 const BALL_TIMER_MS        = Number(process.env.BALL_TIMER_MS) || 5_000;
 const RECONNECT_GRACE_MS   = Number(process.env.RECONNECT_GRACE_MS) || 30_000;
 const BALL_REVEAL_DELAY_MS = Number(process.env.BALL_REVEAL_DELAY_MS) || 1_500;
@@ -39,21 +37,19 @@ const INNINGS_BREAK_MS     = Number(process.env.INNINGS_BREAK_MS) || 3_000;
 const WS_PING_INTERVAL_MS  = Number(process.env.WS_PING_INTERVAL_MS) || 15_000;
 const WS_RATE_LIMIT        = Number(process.env.WS_RATE_LIMIT) || 20;
 const MAINTENANCE_INTERVAL_MS = Number(process.env.MAINTENANCE_INTERVAL_MS) || 60_000;
-const FUNDING_AMOUNT_MIST = BigInt(process.env.FUNDING_AMOUNT_MIST || '1000000000'); // 1 OCT
+const FUNDING_AMOUNT_MIST = BigInt(process.env.FUNDING_AMOUNT_MIST || '1000000000');
 const TREASURY_LOW_THRESHOLD_OCT = Number(process.env.TREASURY_LOW_THRESHOLD_OCT) || 2.0;
 const ADMIN_LOW_THRESHOLD_OCT    = Number(process.env.ADMIN_LOW_THRESHOLD_OCT) || 1.2;
 const FORFEIT_AFTER_DISCONNECT_MS = RECONNECT_GRACE_MS;
 
-// --- Logger setup ---
 const logger = pino({
     level: process.env.LOG_LEVEL || 'info',
     transport: process.env.NODE_ENV === 'development'
         ? { target: 'pino-pretty', options: { colorize: true } }
         : undefined,
 });
-const httpLogger = pinoHttp({ logger, autoLogging: false }); // we'll log requests manually
+const httpLogger = pinoHttp({ logger, autoLogging: false });
 
-// --- Client & Keypair ---
 const client = new SuiClient({ url: RPC_URL });
 const { secretKey } = decodeSuiPrivateKey(process.env.ADMIN_SECRET_KEY!);
 const keypair = Ed25519Keypair.fromSecretKey(secretKey);
@@ -61,7 +57,6 @@ const ADMIN_ADDRESS = keypair.getPublicKey().toSuiAddress();
 
 logger.info(`Backend initialized. Admin address: ${ADMIN_ADDRESS}`);
 
-// --- Transaction Queue (serializes nonce) ---
 class TxQueue {
     private queue: Array<() => Promise<void>> = [];
     private running = false;
@@ -94,14 +89,13 @@ async function signAndWait(tx: Transaction): Promise<string> {
     });
 }
 
-// --- Type definitions for on-chain objects ---
 interface TreasuryFields {
     balance: string;
     total_games_played: number;
     total_payouts: number;
 }
 interface GameFields {
-    status: number;          // 0=waiting,1=toss,2=playing,3=finished
+    status: number;
     winner?: { vec: string[] } | null;
     player1: string;
     player2?: { vec: string[] };
@@ -118,7 +112,6 @@ async function getGameObject(gameId: string): Promise<GameFields | null> {
     }
 }
 
-// --- PvP Room State ---
 interface PlayerSlot {
     ws: WebSocket;
     address: string;
@@ -144,11 +137,11 @@ interface Room {
     p1Moves: number[];
     p2Moves: number[];
     ballTimer: NodeJS.Timeout | null;
+    ballStartTimestamp: number;
     disconnectTimers: Map<'p1' | 'p2', NodeJS.Timeout>;
-    lock: RoomLock;                    // per-room async lock
+    lock: RoomLock;
 }
 
-// Simple async lock per room
 class RoomLock {
     private queue: Array<() => void> = [];
     private locked = false;
@@ -176,7 +169,6 @@ class RoomLock {
 
 const rooms = new Map<string, Room>();
 
-// --- Helper functions ---
 function wsSend(ws: WebSocket, payload: object): void {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(payload));
 }
@@ -192,7 +184,6 @@ function whichSlot(room: Room, ws: WebSocket): 'p1' | 'p2' | null {
     return null;
 }
 
-// --- WebSocket Rate Limiting ---
 interface RateEntry { count: number; resetAt: number; }
 const wsRateMap = new Map<WebSocket, RateEntry>();
 
@@ -205,7 +196,6 @@ function isRateLimited(ws: WebSocket): boolean {
     return entry.count > WS_RATE_LIMIT;
 }
 
-// --- PvP Blockchain Helpers ---
 async function pvpResolveToss(gameId: string, p1ChoseOdd: boolean, p1Toss: number, p2Toss: number, tossWinnerBats: boolean): Promise<string> {
     const tx = new Transaction();
     tx.moveCall({
@@ -258,11 +248,11 @@ async function pvpForfeit(gameId: string, forfeitingPlayer: string): Promise<str
     return signAndWait(tx);
 }
 
-// --- PvP Game Flow ---
 async function startBall(room: Room): Promise<void> {
+    room.ballStartTimestamp = Date.now();
     broadcast(room, {
         type:          'BALL_START',
-        timestamp:     Date.now(),
+        timestamp:     room.ballStartTimestamp,
         currentBatter: room.currentBatter,
         innings:       room.innings,
         p1Score:       room.p1Score,
@@ -285,6 +275,10 @@ async function resolveBall(room: Room): Promise<void> {
     let p1ForceOut = false;
     let p2ForceOut = false;
 
+    if (!p1.hasSubmitted && !p2.hasSubmitted) {
+        p1Move = 1; p2Move = 2;
+    }
+
     if (!p1.hasSubmitted) { p1.timeoutLeft--; if (p1.timeoutLeft <= 0) p1ForceOut = true; }
     if (!p2.hasSubmitted) { p2.timeoutLeft--; if (p2.timeoutLeft <= 0) p2ForceOut = true; }
 
@@ -295,7 +289,6 @@ async function resolveBall(room: Room): Promise<void> {
         p2Move = p1.hasSubmitted ? p1.currentMove! : 1;
     }
 
-    // Extra safety: clamp moves to valid range
     p1Move = Math.min(6, Math.max(1, p1Move));
     p2Move = Math.min(6, Math.max(1, p2Move));
 
@@ -343,9 +336,8 @@ async function resolveBall(room: Room): Promise<void> {
 }
 
 async function handleInningsEnd(room: Room): Promise<void> {
-    // Verify on-chain state before sending transaction
     const onChain = await getGameObject(room.gameId);
-    if (!onChain || onChain.status !== 2) { // 2 = playing
+    if (!onChain || onChain.status !== 2) {
         logger.error(`On-chain state mismatch for game ${room.gameId} (innings end)`);
         await markRoomError(room, 'On-chain game state inconsistent');
         return;
@@ -416,7 +408,6 @@ async function handleGameOver(room: Room, alreadySettled: boolean): Promise<void
             digest,
         });
 
-        // Clean up after 30 seconds
         setTimeout(() => {
             clearRoomTimers(room);
             rooms.delete(room.gameId);
@@ -431,7 +422,6 @@ async function markRoomError(room: Room, errorMessage: string): Promise<void> {
     room.status = 'error';
     broadcast(room, { type: 'ERROR', message: errorMessage, gameId: room.gameId });
     logger.error(`Room ${room.gameId} marked as error: ${errorMessage}`);
-    // Schedule cleanup
     setTimeout(() => {
         clearRoomTimers(room);
         rooms.delete(room.gameId);
@@ -444,7 +434,6 @@ function clearRoomTimers(room: Room): void {
     room.disconnectTimers.clear();
 }
 
-// --- WebSocket Message Handlers (with per-room lock) ---
 async function handleJoinRoom(ws: WebSocket, msg: any): Promise<void> {
     const { gameId, playerAddress, isPlayer1 } = msg;
     if (!gameId || !playerAddress) {
@@ -461,7 +450,6 @@ async function handleJoinRoom(ws: WebSocket, msg: any): Promise<void> {
     if (isPlayer1) {
         if (rooms.has(gameId)) {
             const room = rooms.get(gameId)!;
-            // Acquire lock to modify room state
             const release = await room.lock.acquire();
             try {
                 const dt = room.disconnectTimers.get('p1');
@@ -472,6 +460,7 @@ async function handleJoinRoom(ws: WebSocket, msg: any): Promise<void> {
                     innings: room.innings, p1Score: room.p1Score,
                     p2Score: room.p2Score, targetScore: room.targetScore,
                     currentBatter: room.currentBatter,
+                    ballStartTimestamp: room.ballStartTimestamp,
                 });
                 if (room.p2) broadcast(room, { type: 'OPPONENT_RECONNECTED' });
                 return;
@@ -482,7 +471,8 @@ async function handleJoinRoom(ws: WebSocket, msg: any): Promise<void> {
             status: 'waiting', currentBatter: 'p1', innings: 1,
             p1Score: 0, p2Score: 0, targetScore: 0,
             p1Moves: [], p2Moves: [],
-            ballTimer: null, disconnectTimers: new Map(),
+            ballTimer: null, ballStartTimestamp: 0,
+            disconnectTimers: new Map(),
             lock: new RoomLock(),
         };
         rooms.set(gameId, room);
@@ -513,6 +503,7 @@ async function handleJoinRoom(ws: WebSocket, msg: any): Promise<void> {
                     innings: room.innings, p1Score: room.p1Score,
                     p2Score: room.p2Score, targetScore: room.targetScore,
                     currentBatter: room.currentBatter,
+                    ballStartTimestamp: room.ballStartTimestamp,
                 });
                 broadcast(room, { type: 'OPPONENT_RECONNECTED' });
                 return;
@@ -637,13 +628,11 @@ async function handleSubmitMove(ws: WebSocket, msg: any): Promise<void> {
         player.hasSubmitted = true;
         wsSend(ws, { type: 'MOVE_ACCEPTED', yourMove: n });
         if (room.p1.hasSubmitted && room.p2!.hasSubmitted) {
-            // Both moves ready, resolve the ball
             await resolveBall(room);
         }
     } finally { release(); }
 }
 
-// Disconnect handler (also uses per-room lock)
 async function handleDisconnect(ws: WebSocket): Promise<void> {
     for (const [gameId, room] of rooms) {
         const slot = whichSlot(room, ws);
@@ -665,7 +654,6 @@ async function handleDisconnect(ws: WebSocket): Promise<void> {
                 });
             }
             const timer = setTimeout(async () => {
-                // Acquire lock again before forfeiting
                 const forfeitRelease = await room.lock.acquire();
                 try {
                     logger.info(`⏰ [PvP] Grace expired: ${disconnectedAddress} | forfeiting`);
@@ -694,7 +682,6 @@ async function handleDisconnect(ws: WebSocket): Promise<void> {
     }
 }
 
-// --- Express App ---
 const app = express();
 app.use(cors({
     origin: process.env.CORS_ORIGIN || '*',
@@ -717,7 +704,6 @@ app.get('/health', (_req, res) => {
     });
 });
 
-// WebSocket health
 app.get('/health/ws', (_req, res) => {
     res.json({
         status: wss.clients.size > 0 ? 'active' : 'idle',
@@ -726,7 +712,6 @@ app.get('/health/ws', (_req, res) => {
     });
 });
 
-// Metrics (example)
 app.get('/metrics', requireApiKey, async (_req, res) => {
     try {
         const treasuryObj = await client.getObject({ id: TREASURY_ID, options: { showContent: true } });
@@ -744,7 +729,6 @@ app.get('/metrics', requireApiKey, async (_req, res) => {
     }
 });
 
-// API Key middleware
 function requireApiKey(req: Request, res: Response, next: NextFunction): void {
     if (req.headers['x-api-key'] !== API_KEY) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -753,7 +737,6 @@ function requireApiKey(req: Request, res: Response, next: NextFunction): void {
     next();
 }
 
-// Balance endpoint (with type safety)
 app.get('/api/balance', requireApiKey, async (_req, res) => {
     try {
         const [walletResult, treasuryObj] = await Promise.all([
@@ -827,7 +810,6 @@ app.post('/api/activate-game', requireApiKey, async (req, res) => {
     }
 });
 
-// CPU game endpoints
 app.post('/api/resolve-toss', requireApiKey, async (req, res) => {
     const { gameId, isOdd, playerTossNumber, playerChoosesBat } = req.body;
     if (!validateBody(req.body, ['gameId','isOdd','playerTossNumber','playerChoosesBat'], res)) return;
@@ -952,7 +934,7 @@ app.post('/api/pvp/forfeit', requireApiKey, async (req, res) => {
         logger.info(`✅ [PvP] Manual forfeit | ${gameId} | forfeiter: ${forfeitingPlayer}`);
         const room = rooms.get(gameId);
         if (room) {
-            await room.lock.acquire(); // just to sync
+            await room.lock.acquire();
             clearRoomTimers(room);
             rooms.delete(gameId);
         }
@@ -966,7 +948,6 @@ app.post('/api/pvp/forfeit', requireApiKey, async (req, res) => {
 app.get('/api/pvp/room/:gameId', requireApiKey, async (req, res) => {
     const room = rooms.get(req.params.gameId);
     if (!room) { res.status(404).json({ error: 'Room not found' }); return; }
-    // Acquire lock to read consistent state
     const release = await room.lock.acquire();
     try {
         res.json({
@@ -998,7 +979,6 @@ function validateBody(body: any, fields: string[], res: Response): boolean {
     return true;
 }
 
-// --- Treasury Maintenance ---
 async function runMaintenance(): Promise<void> {
     logger.info(`🔧 Maintenance [${new Date().toLocaleTimeString()}]`);
     try {
@@ -1016,7 +996,6 @@ async function runMaintenance(): Promise<void> {
             if (wOct > ADMIN_LOW_THRESHOLD_OCT) {
                 const tx = new Transaction();
                 tx.setSender(ADMIN_ADDRESS);
-                // Split from gas coin (ensure enough balance)
                 const [coin] = tx.splitCoins(tx.gas, [FUNDING_AMOUNT_MIST]);
                 tx.moveCall({
                     target: `${PACKAGE_ID}::treasury::fund`,
@@ -1037,7 +1016,6 @@ async function runMaintenance(): Promise<void> {
     }
 }
 
-// --- HTTP + WebSocket Server (single port) ---
 const httpServer = createServer(app);
 const wss = new WebSocketServer({ server: httpServer });
 
@@ -1080,13 +1058,12 @@ wss.on('connection', (ws: WebSocket) => {
     wsSend(ws, { type: 'CONNECTED', message: 'Hand Cricket backend ready' });
 });
 
-// --- Start Server (single port for HTTP + WebSocket) ---
 httpServer.listen(PORT, () => {
     logger.info('\n══════════════════════════════════════════════════');
     logger.info('🏏  Hand Cricket Backend  —  Production Ready');
     logger.info('══════════════════════════════════════════════════');
     logger.info(`🌐 HTTP      → http://localhost:${PORT}`);
-    logger.info(`🔌 WebSocket → ws://localhost:${PORT}`);  // same port as HTTP
+    logger.info(`🔌 WebSocket → ws://localhost:${PORT}`);
     logger.info(`👛 Admin     → ${ADMIN_ADDRESS}`);
     logger.info(`📦 Package   → ${PACKAGE_ID}`);
     logger.info('──────────────────────────────────────────────────');
