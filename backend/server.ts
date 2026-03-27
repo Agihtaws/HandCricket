@@ -1,4 +1,3 @@
-// server.ts
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -107,7 +106,6 @@ interface GameFields {
     winner?: { vec: string[] } | null;
     player1: string;
     player2?: { vec: string[] };
-    // ... other fields as needed
 }
 
 async function getGameObject(gameId: string): Promise<GameFields | null> {
@@ -208,7 +206,7 @@ function isRateLimited(ws: WebSocket): boolean {
     return entry.count > WS_RATE_LIMIT;
 }
 
-// --- PvP Blockchain Helpers (unchanged) ---
+// --- PvP Blockchain Helpers ---
 async function pvpResolveToss(gameId: string, p1ChoseOdd: boolean, p1Toss: number, p2Toss: number, tossWinnerBats: boolean): Promise<string> {
     const tx = new Transaction();
     tx.moveCall({
@@ -261,7 +259,7 @@ async function pvpForfeit(gameId: string, forfeitingPlayer: string): Promise<str
     return signAndWait(tx);
 }
 
-// --- PvP Game Flow (with concurrency lock) ---
+// --- PvP Game Flow ---
 async function startBall(room: Room): Promise<void> {
     broadcast(room, {
         type:          'BALL_START',
@@ -393,7 +391,7 @@ async function handleGameOver(room: Room, alreadySettled: boolean): Promise<void
             logger.info(`✅ [PvP] Innings settled (target reached) | ${room.gameId} | digest: ${settleDigest}`);
         }
 
-        // Optionally verify on-chain winner (or rely on local)
+
         const digest = await pvpEndGame(room.gameId);
         logger.info(`✅ [PvP] Game over + payout | ${room.gameId} | digest: ${digest}`);
 
@@ -822,7 +820,7 @@ app.post('/api/activate-game', requireApiKey, async (req, res) => {
     }
 });
 
-// CPU game endpoints (unchanged except using logger)
+// CPU game endpoints
 app.post('/api/resolve-toss', requireApiKey, async (req, res) => {
     const { gameId, isOdd, playerTossNumber, playerChoosesBat } = req.body;
     if (!validateBody(req.body, ['gameId','isOdd','playerTossNumber','playerChoosesBat'], res)) return;
@@ -961,7 +959,7 @@ app.post('/api/pvp/forfeit', requireApiKey, async (req, res) => {
 app.get('/api/pvp/room/:gameId', requireApiKey, async (req, res) => {
     const room = rooms.get(req.params.gameId);
     if (!room) { res.status(404).json({ error: 'Room not found' }); return; }
-    // Acquire lock to read consistent state (optional, but safe)
+    // Acquire lock to read consistent state
     const release = await room.lock.acquire();
     try {
         res.json({
