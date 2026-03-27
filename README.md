@@ -3,7 +3,7 @@
 > **Play the classic hand‑cricket game on the OneChain blockchain.**  
 > Challenge the CPU or play with friends in real‑time PvP matches.
 
-![Game Screenshot Placeholder](https://via.placeholder.com/800x400?text=HandCricket+Game+Preview)
+![HandCricket Game Preview](https://raw.githubusercontent.com/Agihtaws/HandCricket/main/frontend/public/ChatGPT%20Image%20Mar%2027%2C%202026%2C%2003_46_48%20PM.png)
 
 ---
 
