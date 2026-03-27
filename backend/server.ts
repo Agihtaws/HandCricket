@@ -29,8 +29,7 @@ const GAME_CAP_ID  = process.env.GAME_CAP_ID!;
 const ADMIN_CAP_ID = process.env.ADMIN_CAP_ID!;
 const API_KEY      = process.env.API_KEY!;
 const RPC_URL      = process.env.RPC_URL || getFullnodeUrl('testnet');
-const HTTP_PORT    = Number(process.env.HTTP_PORT) || 3001;
-const WS_PORT      = Number(process.env.WS_PORT)   || 3002;
+const PORT = Number(process.env.PORT) || 3001;
 
 // Game timings (ms)
 const BALL_TIMER_MS        = Number(process.env.BALL_TIMER_MS) || 5_000;
@@ -399,7 +398,6 @@ async function handleGameOver(room: Room, alreadySettled: boolean): Promise<void
             logger.info(`✅ [PvP] Innings settled (target reached) | ${room.gameId} | digest: ${settleDigest}`);
         }
 
-
         const digest = await pvpEndGame(room.gameId);
         logger.info(`✅ [PvP] Game over + payout | ${room.gameId} | digest: ${digest}`);
 
@@ -698,7 +696,9 @@ async function handleDisconnect(ws: WebSocket): Promise<void> {
 
 // --- Express App ---
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || '*',
+}));
 app.use(express.json());
 app.use((req, _res, next) => {
     logger.info(`${req.method} ${req.url}`);
@@ -804,7 +804,6 @@ app.post('/api/toss', requireApiKey, async (req, res) => {
         sum,
     });
 });
-
 
 app.post('/api/activate-game', requireApiKey, async (req, res) => {
     const { gameId } = req.body;
@@ -1038,9 +1037,9 @@ async function runMaintenance(): Promise<void> {
     }
 }
 
-// --- WebSocket Server ---
+// --- HTTP + WebSocket Server (single port) ---
 const httpServer = createServer(app);
-const wss = new WebSocketServer({ port: WS_PORT });
+const wss = new WebSocketServer({ server: httpServer });
 
 wss.on('connection', (ws: WebSocket) => {
     logger.info('🔌 WS client connected');
@@ -1081,13 +1080,13 @@ wss.on('connection', (ws: WebSocket) => {
     wsSend(ws, { type: 'CONNECTED', message: 'Hand Cricket backend ready' });
 });
 
-// --- Start Servers ---
-httpServer.listen(HTTP_PORT, () => {
+// --- Start Server (single port for HTTP + WebSocket) ---
+httpServer.listen(PORT, () => {
     logger.info('\n══════════════════════════════════════════════════');
     logger.info('🏏  Hand Cricket Backend  —  Production Ready');
     logger.info('══════════════════════════════════════════════════');
-    logger.info(`🌐 HTTP      → http://localhost:${HTTP_PORT}`);
-    logger.info(`🔌 WebSocket → ws://localhost:${WS_PORT}`);
+    logger.info(`🌐 HTTP      → http://localhost:${PORT}`);
+    logger.info(`🔌 WebSocket → ws://localhost:${PORT}`);  // same port as HTTP
     logger.info(`👛 Admin     → ${ADMIN_ADDRESS}`);
     logger.info(`📦 Package   → ${PACKAGE_ID}`);
     logger.info('──────────────────────────────────────────────────');
