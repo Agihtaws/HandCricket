@@ -66,7 +66,8 @@ Edit `.env` – you’ll need:
 RPC_URL=https://rpc-testnet.onelabs.cc:443
 ADMIN_SECRET_KEY=your_private_key_here
 API_KEY=your_secret_key
-
+PORT=3001
+CORS_ORIGIN=your_frontend_app
 PACKAGE_ID=0x8257d18d73a9ad02d71bcaafe56a36259fefd47fdb70596660b75f422dfdd27e
 TREASURY_ID=0x381a74fe1356c3fbb240f844f05e2987abfb01e706cb8f8e8af1f0ccbb86cd67
 GAME_CAP_ID=0x429ed884407ca70f2d5be318bf7e29e5cfdefaa3f7cf461f45718fc60e3ee963
@@ -77,7 +78,7 @@ VITE_PACKAGE_ID=0x8257d18d73a9ad02d71bcaafe56a36259fefd47fdb70596660b75f422dfdd2
 VITE_TREASURY_ID=0x381a74fe1356c3fbb240f844f05e2987abfb01e706cb8f8e8af1f0ccbb86cd67
 VITE_GAME_CAP_ID=0x429ed884407ca70f2d5be318bf7e29e5cfdefaa3f7cf461f45718fc60e3ee963
 VITE_BACKEND_URL=http://localhost:3001
-VITE_WS_URL=ws://localhost:3002
+VITE_WS_URL=ws://localhost:3001
 VITE_API_KEY=your_api_key
 ```
 
