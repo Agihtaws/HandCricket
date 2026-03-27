@@ -324,7 +324,8 @@ export default function PvPGamePlay({
         setUiPhase('live');
         break;
 
-    case 'GAME_START':   
+    case 'GAME_START':
+        console.log('🎮 GAME_START received', msg);   
         resetBall();
         setInnings(msg.innings ?? 1);
         setBatter(msg.currentBatter);
