@@ -1,6 +1,7 @@
-🏏 HandCricket – On-Chain Cricket Game  
-Play the classic hand-cricket game on the OneChain blockchain.  
-Challenge the CPU or play with friends in real-time PvP matches.
+# 🏏 HandCricket – On‑Chain Cricket Game
+
+> **Play the classic hand‑cricket game on the OneChain blockchain.**  
+> Challenge the CPU or play with friends in real‑time PvP matches.
 
 ## 🎮 Game Preview
 
