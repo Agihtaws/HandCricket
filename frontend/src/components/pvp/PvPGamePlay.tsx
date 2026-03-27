@@ -417,6 +417,21 @@ export default function PvPGamePlay({
                     else setUiPhase('idle');
                     break;
 
+                case 'RECONNECTED':
+    resetBall();
+    setInnings(msg.innings);
+    setTargetScore(msg.targetScore);
+    setBatter(msg.currentBatter);
+    setP1Score(msg.p1Score);
+    setP2Score(msg.p2Score);
+    if (msg.status === 'playing') {
+        setUiPhase('live');
+    } else if (msg.status === 'finished') {
+    } else {
+        setUiPhase('idle');
+    }
+    break;
+
                 case 'ERROR':
                     stopTimer();
                     setErrorMsg(msg.message ?? 'Unexpected server error.');
