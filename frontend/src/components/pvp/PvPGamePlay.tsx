@@ -311,23 +311,35 @@ export default function PvPGamePlay({
             try { msg = JSON.parse(event.data); } catch { return; }
 
             switch (msg.type) {
-                case 'BALL_START':
-                    resetBall();
-                    setInnings(msg.innings ?? 1);
-                    setBatter(msg.currentBatter);
-                    setP1Score(msg.p1Score ?? 0);
-                    setP2Score(msg.p2Score ?? 0);
-                    setTargetScore(msg.targetScore ?? 0);
-                    setP1Chances(msg.p1ChancesLeft ?? 3);
-                    setP2Chances(msg.p2ChancesLeft ?? 3);
-                    startTimer(msg.timestamp);
-                    setUiPhase('live');
-                    break;
+    case 'BALL_START':
+        resetBall();
+        setInnings(msg.innings ?? 1);
+        setBatter(msg.currentBatter);
+        setP1Score(msg.p1Score ?? 0);
+        setP2Score(msg.p2Score ?? 0);
+        setTargetScore(msg.targetScore ?? 0);
+        setP1Chances(msg.p1ChancesLeft ?? 3);
+        setP2Chances(msg.p2ChancesLeft ?? 3);
+        startTimer(msg.timestamp);
+        setUiPhase('live');
+        break;
 
-                case 'MOVE_ACCEPTED':
-                    setMyMove(msg.yourMove);
-                    setUiPhase('submitted');
-                    break;
+    case 'GAME_START':   
+        resetBall();
+        setInnings(msg.innings ?? 1);
+        setBatter(msg.currentBatter);
+        setP1Score(0);
+        setP2Score(0);
+        setTargetScore(0);
+        setP1Chances(3);
+        setP2Chances(3);
+        setUiPhase('live');
+        break;
+
+    case 'MOVE_ACCEPTED':
+        setMyMove(msg.yourMove);
+        setUiPhase('submitted');
+        break;
 
                 case 'BALL_RESULT': {
                     stopTimer();
